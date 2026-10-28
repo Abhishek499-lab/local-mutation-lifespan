@@ -1,0 +1,8 @@
+metric,count
+unique_sample_ids_across_sources,249
+with_variant_inventory,249
+with_callable_matching_row,208
+with_callable_bp_row,208
+with_burden_row,208
+positive_callable_bp,208
+candidate_for_rate_analysis,208

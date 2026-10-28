@@ -1,0 +1,11 @@
+source,path,size_bytes,is_file
+archive,data/original/._GenomeCoverage.txt,261,True
+archive,data/original/GenomeCoverage.txt,8202,True
+archive,data/original/._CallableGenome_mtDNA.txt,385,True
+archive,data/original/CallableGenome_mtDNA.txt,6618,True
+archive,data/original/BinCoverage.RData,34585768,True
+archive,data/original/CallableGenome.RData,1517145466,True
+existing_project_file,04_DATA_AUDIT/STEP7AR/metadata/GenomeCoverage.txt,8202,True
+existing_project_file,04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt,873,True
+existing_project_file,04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json,628,True
+existing_project_file,04_DATA_AUDIT/STEP43_CALLABLE_BP_DENOMINATORS/STEP43_sample_callable_bp.csv,7647,True

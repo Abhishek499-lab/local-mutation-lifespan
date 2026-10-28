@@ -1,0 +1,29 @@
+STEP136 — Bootstrap and scaling-model analysis
+
+Input: <PROJECT_ROOT>/04_DATA_AUDIT/STEP6A/STEP6A_matched_species_dataset.csv
+Species count: 15
+Model: log10(mean mutation rate) ~ log10(lifespan)
+
+OLS slope: -0.861806
+OLS R-squared: 0.850715
+Conventional slope 95% CI: [-1.078118, -0.645493]
+P-value for slope = 0: 9.9513391e-07
+
+Test of slope = -1:
+t statistic: 1.380181
+p-value: 0.19080433
+
+Species bootstrap:
+Replicates: 20000
+Random seed: 20261028
+Percentile slope 95% interval: [-1.095373, -0.721173]
+Percentile R-squared 95% interval: [0.628378, 0.941359]
+Fraction of bootstrap slopes below zero: 1.000000
+Fraction of bootstrap slopes below -1: 0.090250
+
+Interpretation caution:
+Bootstrap resampling is performed over only 15 species. The percentile
+interval describes resampling uncertainty under this procedure; it does not
+remove species-selection bias or establish causation. The test of slope = -1
+is the conventional OLS t-test, not a bootstrap hypothesis test.
+This species-level OLS analysis is not the original mixed-effects model.

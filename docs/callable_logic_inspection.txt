@@ -1,0 +1,93 @@
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	125:     ref.name = sample.info$REFERENCE_GENOME[sample.info$SPECIES_NAME == species][1]
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	126:     genome = readDNAStringSet(gsub("${SPECIES}", species, INPUT$GENOME, fixed=T),
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	127:                               format="fasta", use.names=TRUE)
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	128:     names(genome) = sapply(strsplit(names(genome), " "), `[`, 1)
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	129: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	130:     # Process variants and mutational opportunities per sample
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	131:     samples = sample.info$SAMPLE_NAME[sample.info$SPECIES_NAME == species &
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	132:                                           !(sample.info$SAMPLE_NAME %in% exclude.list)]
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	133:     for (sample.id in samples) {
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	134: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	135:         cat("Processing sample", sample.id, "\n")
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	136:         var.path = gsub("${SAMPLE}", sample.id,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	137:                        gsub("${SPECIES}", species,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	138:                             INPUT$SUBS.FINAL, fixed=T), fixed=T)
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	139:         if (!file.exists(var.path)) {
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	140:             stop("ERROR: File", var.path, "not found.\n")
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	141:         }
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	142: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	143:         vars = read.table(var.path, sep="\t", header=T, check.names=F, as.is=T, comment.char="",
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	144:                           colClasses=c("Chr"="character", "Ref"="character", "Alt"="character"))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	145: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	146:         # Retrieve trinucleotide contexts
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	147:         context = as.character(padAndClip(genome[vars$Chr],
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	148:                                           IRanges(vars$Start - 1, vars$Start + 1),
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	149:                                           Lpadding.letter=".", Rpadding.letter="."))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	150:         stopifnot(identical(as.character(substr(context, 2, 2)), vars$Ref))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	151: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	152:         # Append variants to variant tables
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	153:         sample.vars = rbind(sample.vars,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	154:                             cbind(Sample = sample.id,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	155:                                   Ref = vars$Ref,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	156:                                   Alt = vars$Alt,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	157:                                   Context = context))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	158: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	159:         species.vars = rbind(species.vars,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	160:                              cbind(Sample = gsub("_", " ", toTitleCase(species)),
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	161:                                    Ref = vars$Ref,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	162:                                    Alt = vars$Alt,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	163:                                    Context = context))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	164: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	165:         # Select callable genome regions
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	166:         regions = callable.genome[[sample.id]]
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	167:         genome.regions = padAndClip(genome[seqnames(regions)],
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	168:                                     IRanges(start(regions), end(regions)),
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	169:                                     Lpadding.letter=".", Rpadding.letter=".")
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	170:         callable.size = c(callable.size, sum(width(regions)))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	171: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	172:         # Calculate trinucleotide frequencies and mutational opportunities
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	173:         freqs = colSums(trinucleotideFrequency(genome.regions))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	174:         freqs.pyr = sapply(which(substr(names(freqs), 2, 2) %in% c("C", "T")), function(i) {
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	175:             rcomp = rev.comp(names(freqs)[i])
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	176:             freqs[i] + freqs[rcomp]
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	177:         })
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	178:         sample.opps = rbind(sample.opps,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	179:                             normalise(freqs.pyr[substr(sigfit:::mut_types(), 1, 3)]))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	180: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	181:         rownames(sample.opps)[nrow(sample.opps)] =
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	182:             names(callable.size)[length(callable.size)] = sample.id
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	183:     }
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	184: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	185:     # Combine sample-level opportunities into species-level opportunities
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	186:     species.opps = rbind(species.opps,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	187:                          normalise(colSums(sample.opps[samples, ])))
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	188:     rownames(species.opps)[nrow(species.opps)] = species
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	189: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP7AK/CrossSpecies2021_code/scripts/2_Spectra_SBS.R	190:     rm(genome, vars, context, regions, genome.regions)
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	1: Callable genome structural inspection (Outer List Metadata Only)
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	2: Source: /content/STEP12_callable_genome_work/CallableGenome.RData
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	3: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	4: Loaded objects: callable.genome
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	5: 
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	6: OBJECT: callable.genome
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	7: Length: 208
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	8: Names (First 30):
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	9:  [1] "CATD0001b_lo0004"  "CATD0001b_lo0012"  "CATD0001b_lo0013"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	10:  [4] "CATD0002b_lo0001"  "CATD0002b_lo0003"  "CATD0002b_lo0007"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	11:  [7] "CATD0002b_lo0011"  "CATD0003b_lo0001"  "CATD0003b_lo0004"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	12: [10] "CGKD0001c_lo0001"  "CGKD0001c_lo0003"  "CGKD0001c_lo0006"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	13: [13] "CGKD0001c_lo0010"  "CGKD0001c_lo0014"  "BTAUD0005b_lo0003"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	14: [16] "BTAUD0005b_lo0005" "BTAUD0005b_lo0009" "BTAUD0006b_lo0005"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	15: [19] "BTAUD0006b_lo0006" "BTAUD0006b_lo0009" "BTAUD0006b_lo0011"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	16: [22] "BTAUD0006b_lo0015" "BTAUD0008b_lo0003" "BTAUD0008b_lo0009"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	17: [25] "BTAUD0008b_lo0011" "BTAUD0008b_lo0012" "BTAUD0009b_lo0001"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt	18: [28] "BTAUD0009b_lo0003" "BTAUD0009b_lo0005" "BTAUD0009b_lo0010"
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	1: {
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	2:   "step": "STEP12_CALLABLE_GENOME_INSPECTION",
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	3:   "archive": "<PROJECT_ROOT>/CrossSpecies2021_Data.tar.gz",
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	4:   "temporary_extracted_file": "/content/STEP12_callable_genome_work/CallableGenome.RData",
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	5:   "r_exit_code": 0,
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	6:   "console_log": "<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_R_console_output.txt",
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	7:   "structure_report": "<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_structure.txt",
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	8:   "note": "Metadata/structure inspection only; callable regions were not modified."
+<PROJECT_ROOT>/04_DATA_AUDIT/STEP12_CALLABLE_GENOME_INSPECTION/STEP12_callable_genome_summary.json	9: }
